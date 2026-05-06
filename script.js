@@ -1,33 +1,28 @@
-// フレーム定義
-const FRAMES = [
-  { id: "mother", label: "母の日", tate: "frames/mother_tate.png", yoko: "frames/mother_yoko.png" },
-  { id: "father", label: "父の日", tate: "frames/father_tate.png", yoko: "frames/father_yoko.png" },
-  { id: "keirou", label: "敬老会", tate: "frames/keirou_tate.png", yoko: "frames/keirou_yoko.png" },
-  { id: "birthday", label: "誕生日", tate: "frames/birthday_tate.png", yoko: "frames/birthday_yoko.png" },
-  { id: "christmas", label: "クリスマス", tate: "frames/christmas_tate.png", yoko: "frames/christmas_yoko.png" },
-];
-
 // 状態
-let selectedFrame = null;
+let eventsData = [];
+let selectedEvent = null;
+let selectedVariant = null;
 let currentStream = null;
 let facingMode = "environment";
 let isLandscape = false;
 
-// 要素取得
+// 要素
 const screens = {
-  top: document.getElementById("screen-top"),
-  select: document.getElementById("screen-select"),
+  top:    document.getElementById("screen-top"),
+  event:  document.getElementById("screen-event"),
+  design: document.getElementById("screen-design"),
   camera: document.getElementById("screen-camera"),
-  save: document.getElementById("screen-save"),
+  save:   document.getElementById("screen-save"),
 };
 
-const video = document.getElementById("video");
-const frameOverlay = document.getElementById("frame-overlay");
+const video          = document.getElementById("video");
+const frameOverlay   = document.getElementById("frame-overlay");
 const cameraContainer = document.getElementById("camera-container");
-const canvasResult = document.getElementById("canvas-result");
-const imgResult = document.getElementById("img-result");
-const btnSave = document.getElementById("btn-save");
-const frameList = document.getElementById("frame-list");
+const canvasResult   = document.getElementById("canvas-result");
+const imgResult      = document.getElementById("img-result");
+const btnSave        = document.getElementById("btn-save");
+const eventList      = document.getElementById("event-list");
+const designList     = document.getElementById("design-list");
 
 // 画面切替
 function showScreen(name) {
@@ -35,31 +30,54 @@ function showScreen(name) {
   screens[name].classList.add("active");
 }
 
-// フレーム一覧を描画
-function renderFrameList() {
-  frameList.innerHTML = "";
-  FRAMES.forEach((frame) => {
+// frames.json 読み込み
+async function loadFrames() {
+  const res = await fetch("frames.json");
+  eventsData = await res.json();
+}
+
+// イベント一覧を描画
+function renderEventList() {
+  eventList.innerHTML = "";
+  eventsData.forEach((ev) => {
     const div = document.createElement("div");
-    div.className = "frame-item";
-    div.innerHTML = `<img src="${frame.tate}" alt="${frame.label}"><span class="frame-label">${frame.label}</span>`;
+    div.className = "event-item";
+    div.innerHTML = `<span class="event-emoji">${ev.emoji}</span><span class="event-label">${ev.label}</span>`;
     div.addEventListener("click", () => {
-      document.querySelectorAll(".frame-item").forEach((el) => el.classList.remove("selected"));
-      div.classList.add("selected");
-      selectedFrame = frame;
-      document.getElementById("btn-to-camera").disabled = false;
+      selectedEvent = ev;
+      renderDesignList(ev);
+      document.getElementById("design-event-title").textContent = ev.label + " のデザイン";
+      document.getElementById("btn-to-camera").disabled = true;
+      showScreen("design");
     });
-    frameList.appendChild(div);
+    eventList.appendChild(div);
   });
 }
 
-// 縦横判定
+// デザイン一覧を描画
+function renderDesignList(ev) {
+  designList.innerHTML = "";
+  selectedVariant = null;
+  ev.variants.forEach((v) => {
+    const div = document.createElement("div");
+    div.className = "frame-item";
+    div.innerHTML = `<img src="${v.tate}" alt="${v.label}"><span class="frame-label">${v.label}</span>`;
+    div.addEventListener("click", () => {
+      document.querySelectorAll(".frame-item").forEach((el) => el.classList.remove("selected"));
+      div.classList.add("selected");
+      selectedVariant = v;
+      document.getElementById("btn-to-camera").disabled = false;
+    });
+    designList.appendChild(div);
+  });
+}
+
+// 縦横判定・フレーム切替
 function checkOrientation() {
   isLandscape = window.innerWidth > window.innerHeight;
-  if (cameraContainer) {
-    cameraContainer.classList.toggle("landscape", isLandscape);
-  }
-  if (selectedFrame && frameOverlay.src) {
-    frameOverlay.src = isLandscape ? selectedFrame.yoko : selectedFrame.tate;
+  cameraContainer.classList.toggle("landscape", isLandscape);
+  if (selectedVariant) {
+    frameOverlay.src = isLandscape ? selectedVariant.yoko : selectedVariant.tate;
   }
 }
 
@@ -69,18 +87,14 @@ async function startCamera() {
     currentStream.getTracks().forEach((t) => t.stop());
   }
   try {
-    const constraints = {
-      video: {
-        facingMode: facingMode,
-        width: { ideal: 1920 },
-        height: { ideal: 1080 },
-      },
+    currentStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false,
-    };
-    currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+    });
     video.srcObject = currentStream;
     await video.play();
-  } catch (err) {
+    video.style.transform = facingMode === "user" ? "scaleX(-1)" : "";
+  } catch {
     alert("カメラを起動できませんでした。\nカメラの使用を許可してください。");
   }
 }
@@ -95,7 +109,6 @@ function stopCamera() {
 
 // 撮影
 function capture() {
-  // フラッシュ効果
   const flash = document.createElement("div");
   flash.className = "flash";
   document.body.appendChild(flash);
@@ -103,34 +116,27 @@ function capture() {
 
   const frameImg = new Image();
   frameImg.crossOrigin = "anonymous";
-  frameImg.src = isLandscape ? selectedFrame.yoko : selectedFrame.tate;
+  frameImg.src = isLandscape ? selectedVariant.yoko : selectedVariant.tate;
 
   frameImg.onload = () => {
     const w = frameImg.naturalWidth;
     const h = frameImg.naturalHeight;
-
     canvasResult.width = w;
     canvasResult.height = h;
     const ctx = canvasResult.getContext("2d");
 
-    // カメラ映像を描画
-    const videoAspect = video.videoWidth / video.videoHeight;
-    const canvasAspect = w / h;
+    // カメラ映像をアスペクト比を保ちながら描画
+    const va = video.videoWidth / video.videoHeight;
+    const ca = w / h;
     let sx, sy, sw, sh;
-
-    if (videoAspect > canvasAspect) {
-      sh = video.videoHeight;
-      sw = sh * canvasAspect;
-      sx = (video.videoWidth - sw) / 2;
-      sy = 0;
+    if (va > ca) {
+      sh = video.videoHeight; sw = sh * ca;
+      sx = (video.videoWidth - sw) / 2; sy = 0;
     } else {
-      sw = video.videoWidth;
-      sh = sw / canvasAspect;
-      sx = 0;
-      sy = (video.videoHeight - sh) / 2;
+      sw = video.videoWidth; sh = sw / ca;
+      sx = 0; sy = (video.videoHeight - sh) / 2;
     }
 
-    // 前面カメラの場合は左右反転
     if (facingMode === "user") {
       ctx.save();
       ctx.translate(w, 0);
@@ -141,43 +147,35 @@ function capture() {
       ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
     }
 
-    // フレームを重ねる
     ctx.drawImage(frameImg, 0, 0, w, h);
 
-    // プレビュー表示
     const dataUrl = canvasResult.toDataURL("image/png");
     imgResult.src = dataUrl;
     btnSave.href = dataUrl;
-
     showScreen("save");
     stopCamera();
   };
 
-  frameImg.onerror = () => {
-    alert("フレーム画像の読み込みに失敗しました。");
-  };
+  frameImg.onerror = () => alert("フレーム画像の読み込みに失敗しました。");
 }
 
-// イベント設定
+// イベント登録
 document.getElementById("btn-start").addEventListener("click", () => {
-  renderFrameList();
-  showScreen("select");
+  renderEventList();
+  showScreen("event");
+});
+
+document.getElementById("btn-back-event").addEventListener("click", () => {
+  showScreen("event");
 });
 
 document.getElementById("btn-to-camera").addEventListener("click", async () => {
   checkOrientation();
-  frameOverlay.src = isLandscape ? selectedFrame.yoko : selectedFrame.tate;
   showScreen("camera");
   await startCamera();
 });
 
-document.getElementById("btn-back-top").addEventListener("click", () => {
-  showScreen("top");
-});
-
-document.getElementById("btn-capture").addEventListener("click", () => {
-  capture();
-});
+document.getElementById("btn-capture").addEventListener("click", capture);
 
 document.getElementById("btn-switch-camera").addEventListener("click", async () => {
   facingMode = facingMode === "environment" ? "user" : "environment";
@@ -186,44 +184,23 @@ document.getElementById("btn-switch-camera").addEventListener("click", async () 
 
 document.getElementById("btn-change-frame").addEventListener("click", () => {
   stopCamera();
-  showScreen("select");
+  showScreen("design");
 });
 
 document.getElementById("btn-retake").addEventListener("click", async () => {
   checkOrientation();
-  frameOverlay.src = isLandscape ? selectedFrame.yoko : selectedFrame.tate;
   showScreen("camera");
   await startCamera();
 });
 
 document.getElementById("btn-new-frame").addEventListener("click", () => {
-  selectedFrame = null;
+  selectedVariant = null;
   document.getElementById("btn-to-camera").disabled = true;
-  renderFrameList();
-  showScreen("select");
+  renderDesignList(selectedEvent);
+  showScreen("design");
 });
 
-// 画面回転時のフレーム切替
-window.addEventListener("resize", () => {
-  checkOrientation();
-});
+window.addEventListener("resize", checkOrientation);
 
-// 前面カメラの映像を反転表示
-const style = document.createElement("style");
-document.head.appendChild(style);
-
-const observer = new MutationObserver(() => {
-  if (facingMode === "user") {
-    video.style.transform = "scaleX(-1)";
-  } else {
-    video.style.transform = "";
-  }
-});
-
-video.addEventListener("loadedmetadata", () => {
-  if (facingMode === "user") {
-    video.style.transform = "scaleX(-1)";
-  } else {
-    video.style.transform = "";
-  }
-});
+// 起動時にframes.json読み込み
+loadFrames();

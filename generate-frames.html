@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>フレーム生成ツール</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+    h1 { margin-bottom: 16px; }
+    #status { white-space: pre-wrap; background: #fff; padding: 16px; border-radius: 8px; margin-top: 16px; }
+    canvas { display: none; }
+  </style>
+</head>
+<body>
+  <h1>フレーム画像生成ツール</h1>
+  <p>ボタンを押すと frames/ フォルダ用のサンプルPNG画像をダウンロードできます。</p>
+  <button id="btn-gen" style="padding:12px 24px;font-size:1.1rem;cursor:pointer;">フレームを生成してダウンロード</button>
+  <div id="status"></div>
+  <canvas id="cv"></canvas>
+
+<script>
+const TATE_W = 1080, TATE_H = 1920;
+const YOKO_W = 1920, YOKO_H = 1080;
+
+const frames = [
+  { id: "mother",    label: "Happy Mother's Day", emoji: "💐", color: "#e07b8b", accent: "#f8c8d4" },
+  { id: "father",    label: "Happy Father's Day",  emoji: "👔", color: "#4a7fb5", accent: "#a8cce8" },
+  { id: "keirou",    label: "敬老の日おめでとう",      emoji: "🌸", color: "#d4a056", accent: "#f0dbb8" },
+  { id: "birthday",  label: "Happy Birthday!",     emoji: "🎂", color: "#e8a040", accent: "#fde4b0" },
+  { id: "christmas", label: "Merry Christmas!",    emoji: "🎄", color: "#c0392b", accent: "#f5b7b1" },
+];
+
+function drawFrame(ctx, w, h, frame) {
+  ctx.clearRect(0, 0, w, h);
+
+  const border = Math.min(w, h) * 0.06;
+
+  // 外枠（角丸）
+  ctx.fillStyle = frame.accent;
+  ctx.beginPath();
+  roundRect(ctx, 0, 0, w, h, 24);
+  ctx.fill();
+
+  // 内側を透明にする
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  roundRect(ctx, border, border, w - border * 2, h - border * 2, 16);
+  ctx.fill();
+  ctx.globalCompositeOperation = "source-over";
+
+  // 枠線
+  ctx.strokeStyle = frame.color;
+  ctx.lineWidth = border * 0.3;
+  ctx.beginPath();
+  roundRect(ctx, border * 0.5, border * 0.5, w - border, h - border, 20);
+  ctx.stroke();
+
+  // 上部テキスト
+  const fontSize = Math.min(w, h) * 0.045;
+  ctx.fillStyle = frame.color;
+  ctx.font = `bold ${fontSize}px "Hiragino Sans", sans-serif`;
+  ctx.textAlign = "center";
+  ctx.fillText(frame.label, w / 2, border * 0.7);
+
+  // 四隅の絵文字
+  const emojiSize = Math.min(w, h) * 0.06;
+  ctx.font = `${emojiSize}px serif`;
+  ctx.fillText(frame.emoji, border * 1.2, border * 0.8);
+  ctx.fillText(frame.emoji, w - border * 1.2, border * 0.8);
+  ctx.fillText(frame.emoji, border * 1.2, h - border * 0.4);
+  ctx.fillText(frame.emoji, w - border * 1.2, h - border * 0.4);
+
+  // 下部装飾ライン
+  ctx.strokeStyle = frame.color;
+  ctx.lineWidth = 3;
+  ctx.setLineDash([8, 6]);
+  ctx.beginPath();
+  ctx.moveTo(border * 2, h - border * 0.5);
+  ctx.lineTo(w - border * 2, h - border * 0.5);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function downloadCanvas(canvas, filename) {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setTimeout(resolve, 300);
+    }, "image/png");
+  });
+}
+
+document.getElementById("btn-gen").addEventListener("click", async () => {
+  const status = document.getElementById("status");
+  const cv = document.getElementById("cv");
+  const ctx = cv.getContext("2d");
+  status.textContent = "生成中...\n";
+
+  for (const frame of frames) {
+    // 縦
+    cv.width = TATE_W;
+    cv.height = TATE_H;
+    drawFrame(ctx, TATE_W, TATE_H, frame);
+    await downloadCanvas(cv, `${frame.id}_tate.png`);
+    status.textContent += `✅ ${frame.id}_tate.png\n`;
+
+    // 横
+    cv.width = YOKO_W;
+    cv.height = YOKO_H;
+    drawFrame(ctx, YOKO_W, YOKO_H, frame);
+    await downloadCanvas(cv, `${frame.id}_yoko.png`);
+    status.textContent += `✅ ${frame.id}_yoko.png\n`;
+  }
+
+  status.textContent += "\n完了！ダウンロードされたファイルを frames/ フォルダに移動してください。";
+});
+</script>
+</body>
+</html>

@@ -38,9 +38,33 @@ h1 {
 }
 
 h2 {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   margin-bottom: 20px;
   color: #555;
+}
+
+.screen-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.screen-header h2 {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: #e07b8b;
+  font-size: 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 4px 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .steps {
@@ -75,14 +99,8 @@ h2 {
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn-primary:hover {
-  background: #c96878;
-}
-
-.btn-primary:disabled {
-  background: #ccc;
-  cursor: default;
-}
+.btn-primary:hover { background: #c96878; }
+.btn-primary:disabled { background: #ccc; cursor: default; }
 
 .btn-secondary {
   display: inline-block;
@@ -100,9 +118,7 @@ h2 {
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn-secondary:hover {
-  border-color: #bbb;
-}
+.btn-secondary:hover { border-color: #bbb; }
 
 .notice {
   margin-top: 24px;
@@ -111,7 +127,45 @@ h2 {
   line-height: 1.6;
 }
 
-/* フレーム選択 */
+/* イベント選択 */
+.event-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.event-item {
+  background: #fff;
+  border: 3px solid transparent;
+  border-radius: 16px;
+  padding: 20px 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.event-item:active { transform: scale(0.96); }
+
+.event-item:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.event-emoji {
+  font-size: 2.4rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.event-label {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #555;
+}
+
+/* デザイン選択 */
 .frame-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -120,7 +174,6 @@ h2 {
 }
 
 .frame-item {
-  position: relative;
   background: #fff;
   border: 3px solid transparent;
   border-radius: 12px;
@@ -130,9 +183,7 @@ h2 {
   -webkit-tap-highlight-color: transparent;
 }
 
-.frame-item:hover {
-  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-}
+.frame-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
 
 .frame-item.selected {
   border-color: #e07b8b;
@@ -155,13 +206,8 @@ h2 {
 }
 
 /* 撮影画面 */
-#screen-camera {
-  background: #000;
-}
-
-#screen-camera.active {
-  justify-content: space-between;
-}
+#screen-camera { background: #000; }
+#screen-camera.active { justify-content: space-between; }
 
 .camera-wrapper {
   flex: 1;
@@ -169,7 +215,6 @@ h2 {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  position: relative;
 }
 
 .camera-container {
@@ -180,25 +225,19 @@ h2 {
   overflow: hidden;
 }
 
-.camera-container.landscape {
-  aspect-ratio: 16 / 9;
-}
+.camera-container.landscape { aspect-ratio: 16 / 9; }
 
 .camera-container video {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   object-fit: cover;
 }
 
 .frame-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   object-fit: contain;
   pointer-events: none;
   z-index: 2;
@@ -228,9 +267,7 @@ h2 {
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn-capture:active {
-  transform: scale(0.92);
-}
+.btn-capture:active { transform: scale(0.92); }
 
 .btn-icon {
   width: 52px;
@@ -244,14 +281,10 @@ h2 {
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn-icon:hover {
-  background: rgba(255,255,255,0.3);
-}
+.btn-icon:hover { background: rgba(255,255,255,0.3); }
 
 /* 保存画面 */
-.preview-wrapper {
-  margin-bottom: 20px;
-}
+.preview-wrapper { margin-bottom: 20px; }
 
 .img-result {
   width: 100%;
@@ -260,13 +293,11 @@ h2 {
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 }
 
-/* 撮影画面のフラッシュ効果 */
+/* フラッシュ */
 .flash {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: #fff;
   z-index: 100;
   animation: flash-anim 0.3s ease-out forwards;
@@ -274,6 +305,6 @@ h2 {
 }
 
 @keyframes flash-anim {
-  0% { opacity: 0.9; }
+  0%   { opacity: 0.9; }
   100% { opacity: 0; }
 }
