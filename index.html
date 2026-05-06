@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>フォトフレーム撮影</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- トップ画面 -->
+  <div id="screen-top" class="screen active">
+    <div class="container">
+      <h1>📷 フォトフレーム撮影</h1>
+      <div class="steps">
+        <p>① フレームを選ぶ</p>
+        <p>② 撮影する</p>
+        <p>③ 保存する</p>
+      </div>
+      <button id="btn-start" class="btn-primary">撮影をはじめる</button>
+      <p class="notice">撮影した写真はこの端末にのみ保存されます。<br>Webサイト側には保存されません。</p>
+    </div>
+  </div>
+
+  <!-- フレーム選択画面 -->
+  <div id="screen-select" class="screen">
+    <div class="container">
+      <h2>フレームを選んでください</h2>
+      <div id="frame-list" class="frame-list"></div>
+      <button id="btn-to-camera" class="btn-primary" disabled>このフレームで撮影する</button>
+      <button id="btn-back-top" class="btn-secondary">もどる</button>
+    </div>
+  </div>
+
+  <!-- 撮影画面 -->
+  <div id="screen-camera" class="screen">
+    <div class="camera-wrapper">
+      <div id="camera-container" class="camera-container">
+        <video id="video" autoplay playsinline></video>
+        <img id="frame-overlay" class="frame-overlay" src="" alt="">
+      </div>
+    </div>
+    <div class="camera-controls">
+      <button id="btn-switch-camera" class="btn-icon" title="カメラ切替">🔄</button>
+      <button id="btn-capture" class="btn-capture">撮影する</button>
+      <button id="btn-change-frame" class="btn-icon" title="フレーム変更">🖼️</button>
+    </div>
+  </div>
+
+  <!-- 保存画面 -->
+  <div id="screen-save" class="screen">
+    <div class="container">
+      <h2>撮影結果</h2>
+      <div class="preview-wrapper">
+        <canvas id="canvas-result" style="display:none;"></canvas>
+        <img id="img-result" class="img-result" src="" alt="撮影結果">
+      </div>
+      <a id="btn-save" class="btn-primary" download="photo-frame.png">保存する</a>
+      <button id="btn-retake" class="btn-secondary">撮り直す</button>
+      <button id="btn-new-frame" class="btn-secondary">フレームを変えて撮る</button>
+      <p class="notice">保存できない場合は、画像を長押しして<br>「写真に保存」を選んでください。</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
+  background: #f5f0eb;
+  color: #333;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+.screen {
+  display: none;
+  min-height: 100dvh;
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 480px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin-bottom: 24px;
+  color: #e07b8b;
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.steps {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.steps p {
+  font-size: 1.1rem;
+  padding: 8px 0;
+  color: #555;
+}
+
+.btn-primary {
+  display: inline-block;
+  width: 100%;
+  max-width: 320px;
+  padding: 18px 24px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  background: #e07b8b;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-primary:hover {
+  background: #c96878;
+}
+
+.btn-primary:disabled {
+  background: #ccc;
+  cursor: default;
+}
+
+.btn-secondary {
+  display: inline-block;
+  width: 100%;
+  max-width: 320px;
+  padding: 14px 24px;
+  font-size: 1rem;
+  color: #888;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-secondary:hover {
+  border-color: #bbb;
+}
+
+.notice {
+  margin-top: 24px;
+  font-size: 0.85rem;
+  color: #999;
+  line-height: 1.6;
+}
+
+/* フレーム選択 */
+.frame-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.frame-item {
+  position: relative;
+  background: #fff;
+  border: 3px solid transparent;
+  border-radius: 12px;
+  padding: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.frame-item:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+.frame-item.selected {
+  border-color: #e07b8b;
+  box-shadow: 0 2px 12px rgba(224,123,139,0.3);
+}
+
+.frame-item img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 50% / 16px 16px;
+}
+
+.frame-item .frame-label {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: bold;
+}
+
+/* 撮影画面 */
+#screen-camera {
+  background: #000;
+}
+
+#screen-camera.active {
+  justify-content: space-between;
+}
+
+.camera-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.camera-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+}
+
+.camera-container.landscape {
+  aspect-ratio: 16 / 9;
+}
+
+.camera-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.frame-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.camera-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 16px;
+  background: rgba(0,0,0,0.6);
+  flex-shrink: 0;
+}
+
+.btn-capture {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #e07b8b;
+  border: 4px solid #fff;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-capture:active {
+  transform: scale(0.92);
+}
+
+.btn-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #fff;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-icon:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* 保存画面 */
+.preview-wrapper {
+  margin-bottom: 20px;
+}
+
+.img-result {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+/* 撮影画面のフラッシュ効果 */
+.flash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 100;
+  animation: flash-anim 0.3s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes flash-anim {
+  0% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
