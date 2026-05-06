@@ -4,8 +4,12 @@
     "label": "母の日",
     "emoji": "💐",
     "variants": [
-      { "id": "pink",   "label": "ピンク",   "tate": "frames/mother/pink_tate.png",   "yoko": "frames/mother/pink_yoko.png" },
-      { "id": "flower", "label": "フラワー", "tate": "frames/mother/flower_tate.png", "yoko": "frames/mother/flower_yoko.png" }
+      { "id": "carnationA", "label": "カーネーションA", "tate": "frames/mother/carnationA_tate.png", "yoko": "frames/mother/carnationA_yoko.png" },
+      { "id": "carnationB", "label": "カーネーションB", "tate": "frames/mother/carnationB_tate.png", "yoko": "frames/mother/carnationB_yoko.png" },
+      { "id": "carnationC", "label": "カーネーションC", "tate": "frames/mother/carnationC_tate.png", "yoko": "frames/mother/carnationC_yoko.png" },
+      { "id": "heartA",     "label": "ハートA",         "tate": "frames/mother/heartA_tate.png",     "yoko": "frames/mother/heartA_yoko.png" },
+      { "id": "heartB",     "label": "ハートB",         "tate": "frames/mother/heartB_tate.png",     "yoko": "frames/mother/heartB_yoko.png" },
+      { "id": "lace",       "label": "レース",           "tate": "frames/mother/lace_tate.png",       "yoko": "frames/mother/lace_yoko.png" }
     ]
   },
   {
