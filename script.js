@@ -79,6 +79,7 @@ async function startCamera() {
     };
     currentStream = await navigator.mediaDevices.getUserMedia(constraints);
     video.srcObject = currentStream;
+    await video.play();
   } catch (err) {
     alert("カメラを起動できませんでした。\nカメラの使用を許可してください。");
   }
