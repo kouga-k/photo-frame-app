@@ -4,7 +4,6 @@
     "label": "母の日",
     "emoji": "💐",
     "variants": [
-      { "id": "bg1", "label": "背景①", "type": "background", "src": "frames/mother/bg1.png" },
       { "id": "carnationA", "label": "カーネーションA", "tate": "frames/mother/carnationA_tate.png", "yoko": "frames/mother/carnationA_yoko.png" },
       { "id": "carnationB", "label": "カーネーションB", "tate": "frames/mother/carnationB_tate.png", "yoko": "frames/mother/carnationB_yoko.png" },
       { "id": "carnationC", "label": "カーネーションC", "tate": "frames/mother/carnationC_tate.png", "yoko": "frames/mother/carnationC_yoko.png" },
