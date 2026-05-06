@@ -6,6 +6,10 @@ let currentStream = null;
 let facingMode = "environment";
 let isLandscape = false;
 
+// キャッシュ対策（起動ごとに新しい値）
+const cacheBust = Date.now();
+const bust = (url) => url + (url.includes("?") ? "&" : "?") + "v=" + cacheBust;
+
 // 要素
 const screens = {
   top:    document.getElementById("screen-top"),
@@ -32,7 +36,7 @@ function showScreen(name) {
 
 // frames.json 読み込み
 async function loadFrames() {
-  const res = await fetch("frames.json");
+  const res = await fetch(bust("frames.json"), { cache: "no-store" });
   eventsData = await res.json();
 }
 
@@ -59,7 +63,7 @@ function renderDesignList(ev) {
   designList.innerHTML = "";
   selectedVariant = null;
   ev.variants.forEach((v) => {
-    const thumbSrc = v.tate;
+    const thumbSrc = bust(v.tate);
     const div = document.createElement("div");
     div.className = "frame-item";
     div.innerHTML = `<img src="${thumbSrc}" alt="${v.label}"><span class="frame-label">${v.label}</span>`;
@@ -78,7 +82,7 @@ function checkOrientation() {
   isLandscape = window.innerWidth > window.innerHeight;
   cameraContainer.classList.toggle("landscape", isLandscape);
   if (selectedVariant) {
-    frameOverlay.src = isLandscape ? selectedVariant.yoko : selectedVariant.tate;
+    frameOverlay.src = bust(isLandscape ? selectedVariant.yoko : selectedVariant.tate);
   }
 }
 
@@ -117,7 +121,7 @@ function capture() {
 
   const frameImg = new Image();
   frameImg.crossOrigin = "anonymous";
-  frameImg.src = isLandscape ? selectedVariant.yoko : selectedVariant.tate;
+  frameImg.src = bust(isLandscape ? selectedVariant.yoko : selectedVariant.tate);
 
   frameImg.onload = () => {
     const w = frameImg.naturalWidth;
