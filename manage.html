@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>フレーム管理ツール</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+      background: #f5f0eb;
+      color: #333;
+      padding: 24px 16px;
+    }
+    h1 { color: #e07b8b; font-size: 1.4rem; margin-bottom: 8px; }
+    .subtitle { color: #999; font-size: 0.85rem; margin-bottom: 24px; }
+
+    .top-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-pink  { background: #e07b8b; color: #fff; }
+    .btn-white { background: #fff; color: #e07b8b; border: 2px solid #e07b8b; }
+    .btn-gray  { background: #eee; color: #666; }
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-add    { background: #e07b8b; color: #fff; }
+    .btn-delete { background: #eee; color: #999; }
+
+    /* イベントカード */
+    .event-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .event-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .event-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .event-emoji-display { font-size: 2rem; }
+    .event-info { flex: 1; }
+    .event-name-display { font-size: 1.1rem; font-weight: bold; }
+    .event-id-display   { font-size: 0.8rem; color: #aaa; }
+
+    .variants-title {
+      font-size: 0.85rem;
+      color: #999;
+      margin-bottom: 8px;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 12px;
+    }
+
+    .variant-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f8f8f8;
+      flex-wrap: wrap;
+    }
+    .variant-label { font-weight: bold; font-size: 0.95rem; flex: 1; min-width: 80px; }
+    .variant-path {
+      font-size: 0.75rem;
+      color: #bbb;
+      background: #f8f8f8;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+
+    /* モーダル */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-bg.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 20px;
+      padding: 28px 24px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+    .modal h2 { font-size: 1.1rem; margin-bottom: 20px; color: #555; }
+    .form-group { margin-bottom: 16px; text-align: left; }
+    .form-group label { display: block; font-size: 0.85rem; color: #888; margin-bottom: 6px; }
+    .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #eee;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: #e07b8b; }
+    .form-hint { font-size: 0.78rem; color: #bbb; margin-top: 4px; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-btns .btn { flex: 1; }
+
+    /* ファイル名案内 */
+    .filename-box {
+      background: #fff8f0;
+      border: 1px solid #f8d8b0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-top: 12px;
+      font-size: 0.82rem;
+      color: #c07030;
+      text-align: left;
+    }
+    .filename-box strong { display: block; margin-bottom: 6px; }
+    .filename-box code {
+      display: block;
+      font-family: monospace;
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin: 2px 0;
+    }
+
+    .save-note {
+      background: #e8f8e8;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-top: 24px;
+      font-size: 0.88rem;
+      color: #4a8a4a;
+      line-height: 1.7;
+    }
+    .save-note strong { display: block; margin-bottom: 6px; font-size: 1rem; }
+  </style>
+</head>
+<body>
+
+<h1>🖼️ フレーム管理ツール</h1>
+<p class="subtitle">イベントとデザインを追加・削除できます</p>
+
+<div class="top-bar">
+  <button class="btn btn-pink"  id="btn-add-event">＋ イベントを追加</button>
+  <button class="btn btn-white" id="btn-save">💾 保存してダウンロード</button>
+</div>
+
+<div class="event-list" id="event-list"></div>
+
+<div class="save-note">
+  <strong>📋 保存後の手順</strong>
+  ① 「保存してダウンロード」→ frames.json をこのフォルダに上書き保存<br>
+  ② PNGを framesフォルダ の該当イベントフォルダに入れる<br>
+  ③ update.bat をダブルクリック → GitHubに自動反映
+</div>
+
+<!-- イベント追加モーダル -->
+<div class="modal-bg" id="modal-event">
+  <div class="modal">
+    <h2>イベントを追加</h2>
+    <div class="form-group">
+      <label>イベント名（日本語）</label>
+      <input id="ev-label" type="text" placeholder="例：七夕">
+    </div>
+    <div class="form-group">
+      <label>絵文字</label>
+      <input id="ev-emoji" type="text" placeholder="例：🎋">
+    </div>
+    <div class="form-group">
+      <label>フォルダ名（英数字・ハイフン）</label>
+      <input id="ev-id" type="text" placeholder="例：tanabata">
+      <p class="form-hint">framesフォルダ内に同じ名前のフォルダを作ってください</p>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gray"  id="ev-cancel">キャンセル</button>
+      <button class="btn btn-pink"  id="ev-ok">追加する</button>
+    </div>
+  </div>
+</div>
+
+<!-- デザイン追加モーダル -->
+<div class="modal-bg" id="modal-variant">
+  <div class="modal">
+    <h2 id="variant-modal-title">デザインを追加</h2>
+    <div class="form-group">
+      <label>デザイン名（日本語）</label>
+      <input id="v-label" type="text" placeholder="例：ブルー">
+    </div>
+    <div class="form-group">
+      <label>ファイル名のキー（英数字・ハイフン）</label>
+      <input id="v-id" type="text" placeholder="例：blue">
+      <p class="form-hint">PNG のファイル名に使われます</p>
+    </div>
+    <div id="filename-preview" class="filename-box" style="display:none;">
+      <strong>📁 用意するPNG ファイル名</strong>
+      <code id="fname-tate"></code>
+      <code id="fname-yoko"></code>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gray" id="v-cancel">キャンセル</button>
+      <button class="btn btn-pink" id="v-ok">追加する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let data = [];
+let editingEventIndex = null;
+
+// frames.json 読み込み
+async function loadData() {
+  try {
+    const res = await fetch("frames.json");
+    data = await res.json();
+  } catch {
+    data = [];
+  }
+  render();
+}
+
+// 一覧描画
+function render() {
+  const list = document.getElementById("event-list");
+  list.innerHTML = "";
+
+  if (data.length === 0) {
+    list.innerHTML = "<p style='color:#aaa;text-align:center;padding:24px'>イベントがまだありません</p>";
+    return;
+  }
+
+  data.forEach((ev, ei) => {
+    const card = document.createElement("div");
+    card.className = "event-card";
+    card.innerHTML = `
+      <div class="event-header">
+        <span class="event-emoji-display">${ev.emoji}</span>
+        <div class="event-info">
+          <div class="event-name-display">${ev.label}</div>
+          <div class="event-id-display">フォルダ：frames/${ev.id}/</div>
+        </div>
+        <button class="btn-sm btn-delete" data-del-event="${ei}">削除</button>
+      </div>
+      <div class="variants-title">デザイン一覧</div>
+      ${ev.variants.map((v, vi) => `
+        <div class="variant-row">
+          <span class="variant-label">${v.label}</span>
+          <span class="variant-path">${ev.id}/${v.id}_tate.png</span>
+          <span class="variant-path">${ev.id}/${v.id}_yoko.png</span>
+          <button class="btn-sm btn-delete" data-del-variant="${ei}-${vi}">削除</button>
+        </div>
+      `).join("")}
+      <div style="margin-top:12px;">
+        <button class="btn-sm btn-add" data-add-variant="${ei}">＋ デザインを追加</button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  // 削除・追加ボタンのイベント
+  list.querySelectorAll("[data-del-event]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const i = parseInt(btn.dataset.delEvent);
+      if (confirm(`「${data[i].label}」を削除しますか？`)) {
+        data.splice(i, 1);
+        render();
+      }
+    });
+  });
+
+  list.querySelectorAll("[data-del-variant]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const [ei, vi] = btn.dataset.delVariant.split("-").map(Number);
+      if (confirm(`「${data[ei].variants[vi].label}」を削除しますか？`)) {
+        data[ei].variants.splice(vi, 1);
+        render();
+      }
+    });
+  });
+
+  list.querySelectorAll("[data-add-variant]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      editingEventIndex = parseInt(btn.dataset.addVariant);
+      document.getElementById("variant-modal-title").textContent =
+        `「${data[editingEventIndex].label}」にデザインを追加`;
+      document.getElementById("v-label").value = "";
+      document.getElementById("v-id").value = "";
+      document.getElementById("filename-preview").style.display = "none";
+      document.getElementById("modal-variant").classList.add("open");
+    });
+  });
+}
+
+// ファイル名プレビュー
+document.getElementById("v-id").addEventListener("input", () => {
+  const vid = document.getElementById("v-id").value.trim();
+  if (vid && editingEventIndex !== null) {
+    const eid = data[editingEventIndex].id;
+    document.getElementById("fname-tate").textContent = `frames/${eid}/${vid}_tate.png`;
+    document.getElementById("fname-yoko").textContent = `frames/${eid}/${vid}_yoko.png`;
+    document.getElementById("filename-preview").style.display = "block";
+  } else {
+    document.getElementById("filename-preview").style.display = "none";
+  }
+});
+
+// イベント追加
+document.getElementById("btn-add-event").addEventListener("click", () => {
+  document.getElementById("ev-label").value = "";
+  document.getElementById("ev-emoji").value = "";
+  document.getElementById("ev-id").value = "";
+  document.getElementById("modal-event").classList.add("open");
+});
+
+document.getElementById("ev-cancel").addEventListener("click", () =>
+  document.getElementById("modal-event").classList.remove("open"));
+
+document.getElementById("ev-ok").addEventListener("click", () => {
+  const label = document.getElementById("ev-label").value.trim();
+  const emoji = document.getElementById("ev-emoji").value.trim();
+  const id    = document.getElementById("ev-id").value.trim().replace(/[^a-z0-9\-_]/gi, "");
+  if (!label || !emoji || !id) { alert("すべて入力してください"); return; }
+  if (data.find((e) => e.id === id)) { alert("同じフォルダ名がすでにあります"); return; }
+  data.push({ id, label, emoji, variants: [] });
+  document.getElementById("modal-event").classList.remove("open");
+  render();
+});
+
+// デザイン追加
+document.getElementById("v-cancel").addEventListener("click", () =>
+  document.getElementById("modal-variant").classList.remove("open"));
+
+document.getElementById("v-ok").addEventListener("click", () => {
+  const label = document.getElementById("v-label").value.trim();
+  const vid   = document.getElementById("v-id").value.trim().replace(/[^a-z0-9\-_]/gi, "");
+  if (!label || !vid) { alert("すべて入力してください"); return; }
+  const ev = data[editingEventIndex];
+  if (ev.variants.find((v) => v.id === vid)) { alert("同じキーがすでにあります"); return; }
+  ev.variants.push({
+    id: vid,
+    label,
+    tate: `frames/${ev.id}/${vid}_tate.png`,
+    yoko: `frames/${ev.id}/${vid}_yoko.png`,
+  });
+  document.getElementById("modal-variant").classList.remove("open");
+  render();
+});
+
+// 保存（ダウンロード）
+document.getElementById("btn-save").addEventListener("click", () => {
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "frames.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+loadData();
+</script>
+</body>
+</html>
