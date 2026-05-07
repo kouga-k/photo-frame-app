@@ -105,6 +105,7 @@ function renderDesignList(ev) {
 function updateFrameOverlay() {
   if (selectedFrame) {
     frameOverlay.src = bust(selectedFrame.src);
+    cameraContainer.classList.toggle("landscape", selectedFrame.orientation === "yoko");
   }
 }
 
