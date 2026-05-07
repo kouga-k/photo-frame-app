@@ -4,13 +4,13 @@
     "label": "母の日",
     "emoji": "💐",
     "variants": [
-      { "id": "motherA", "label": "母の日A", "tate": "frames/mother/mother_tateA.png", "yoko": "frames/mother/mother_yokoA.png" },
-      { "id": "motherB", "label": "母の日B", "tate": "frames/mother/mother_tateB.png", "yoko": "frames/mother/mother_yokoB.png" },
-      { "id": "motherC", "label": "母の日C", "tate": "frames/mother/mother_tateC.png", "yoko": "frames/mother/mother_yokoC.png" },
-      { "id": "motherD", "label": "母の日D", "tate": "frames/mother/mother_tateD.png", "yoko": "frames/mother/mother_yokoD.png" },
-      { "id": "motherE", "label": "母の日E", "tate": "frames/mother/mother_tateE.png", "yoko": "frames/mother/mother_tateE.png" },
-      { "id": "heartA",  "label": "ハートA",  "tate": "frames/mother/heartA_tate.png",  "yoko": "frames/mother/heartA_tate.png" },
-      { "id": "heartB",  "label": "ハートB",  "tate": "frames/mother/heartB_tate.png",  "yoko": "frames/mother/heartB_tate.png" }
+      { "id": "motherA", "label": "母の日A", "tate": "frames/mother/mother_tateA.png" },
+      { "id": "motherB", "label": "母の日B", "tate": "frames/mother/mother_tateB.png" },
+      { "id": "motherC", "label": "母の日C", "tate": "frames/mother/mother_tateC.png" },
+      { "id": "motherD", "label": "母の日D", "tate": "frames/mother/mother_tateD.png" },
+      { "id": "motherE", "label": "母の日E", "tate": "frames/mother/mother_tateE.png" },
+      { "id": "heartA",  "label": "ハートA",  "tate": "frames/mother/heartA_tate.png" },
+      { "id": "heartB",  "label": "ハートB",  "tate": "frames/mother/heartB_tate.png" }
     ]
   },
   {
@@ -18,8 +18,8 @@
     "label": "父の日",
     "emoji": "👔",
     "variants": [
-      { "id": "blue",  "label": "ブルー",  "tate": "frames/father/blue_tate.png",  "yoko": "frames/father/blue_yoko.png" },
-      { "id": "green", "label": "グリーン", "tate": "frames/father/green_tate.png", "yoko": "frames/father/green_yoko.png" }
+      { "id": "blue",  "label": "ブルー",  "tate": "frames/father/blue_tate.png" },
+      { "id": "green", "label": "グリーン", "tate": "frames/father/green_tate.png" }
     ]
   },
   {
@@ -27,8 +27,8 @@
     "label": "敬老会",
     "emoji": "🌸",
     "variants": [
-      { "id": "gold",   "label": "ゴールド", "tate": "frames/keirou/gold_tate.png",   "yoko": "frames/keirou/gold_yoko.png" },
-      { "id": "sakura", "label": "さくら",   "tate": "frames/keirou/sakura_tate.png", "yoko": "frames/keirou/sakura_yoko.png" }
+      { "id": "gold",   "label": "ゴールド", "tate": "frames/keirou/gold_tate.png" },
+      { "id": "sakura", "label": "さくら",   "tate": "frames/keirou/sakura_tate.png" }
     ]
   },
   {
@@ -36,8 +36,8 @@
     "label": "誕生日",
     "emoji": "🎂",
     "variants": [
-      { "id": "colorful", "label": "カラフル", "tate": "frames/birthday/colorful_tate.png", "yoko": "frames/birthday/colorful_yoko.png" },
-      { "id": "cake",     "label": "ケーキ",   "tate": "frames/birthday/cake_tate.png",     "yoko": "frames/birthday/cake_yoko.png" }
+      { "id": "colorful", "label": "カラフル", "tate": "frames/birthday/colorful_tate.png" },
+      { "id": "cake",     "label": "ケーキ",   "tate": "frames/birthday/cake_tate.png" }
     ]
   },
   {
@@ -45,8 +45,8 @@
     "label": "クリスマス",
     "emoji": "🎄",
     "variants": [
-      { "id": "red",  "label": "レッド",  "tate": "frames/christmas/red_tate.png",  "yoko": "frames/christmas/red_yoko.png" },
-      { "id": "snow", "label": "スノー",  "tate": "frames/christmas/snow_tate.png", "yoko": "frames/christmas/snow_yoko.png" }
+      { "id": "red",  "label": "レッド",  "tate": "frames/christmas/red_tate.png" },
+      { "id": "snow", "label": "スノー",  "tate": "frames/christmas/snow_tate.png" }
     ]
   }
 ]

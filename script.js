@@ -29,9 +29,6 @@ const designList      = document.getElementById("design-list");
 const countdownEl     = document.getElementById("countdown");
 const zoomLabel       = document.getElementById("zoom-label");
 
-// 手動回転（縦横切替ボタン）
-let manualRotation = false;
-
 // ズーム
 let zoomLevel = 1.0;
 const ZOOM_MIN = 1.0;
@@ -86,13 +83,12 @@ function renderDesignList(ev) {
 
   const frames = [];
   ev.variants.forEach((v) => {
-    if (v.tate) frames.push({ id: v.id + "_tate", label: v.label + "（縦）", src: v.tate, orientation: "tate", variant: v });
-    if (v.yoko && v.yoko !== v.tate) frames.push({ id: v.id + "_yoko", label: v.label + "（横）", src: v.yoko, orientation: "yoko", variant: v });
+    if (v.tate) frames.push({ id: v.id, label: v.label, src: v.tate });
   });
 
   frames.forEach((f) => {
     const div = document.createElement("div");
-    div.className = "frame-item frame-item-" + f.orientation;
+    div.className = "frame-item";
     div.innerHTML = `<img src="${bust(f.src)}" alt="${f.label}"><span class="frame-label">${f.label}</span>`;
     div.addEventListener("click", () => {
       document.querySelectorAll(".frame-item").forEach((el) => el.classList.remove("selected"));
@@ -108,46 +104,10 @@ function renderDesignList(ev) {
 function updateFrameOverlay() {
   if (selectedFrame) {
     frameOverlay.src = bust(selectedFrame.src);
-    requestAnimationFrame(() => requestAnimationFrame(fitCameraContainer));
   }
 }
 
-// スマホ向きに合わせてフレームを自動切り替え
-function autoRotateFrame() {
-  if (!selectedFrame || !selectedFrame.variant) return;
-  const v = selectedFrame.variant;
-  if (!v.tate || !v.yoko || v.tate === v.yoko) {
-    fitCameraContainer();
-    return;
-  }
-  const isLandscapeScreen = window.innerWidth > window.innerHeight;
-  const wantOrientation = isLandscapeScreen ? "yoko" : "tate";
-  if (selectedFrame.orientation !== wantOrientation) {
-    selectedFrame.orientation = wantOrientation;
-    selectedFrame.src = wantOrientation === "yoko" ? v.yoko : v.tate;
-    frameOverlay.src = bust(selectedFrame.src);
-  }
-  fitCameraContainer();
-}
-
-// カメラ表示エリアを画面いっぱいに（回転時は寸法を入れ替え）
-function fitCameraContainer() {
-  if (!selectedFrame) return;
-  const wrapper = document.querySelector(".camera-wrapper");
-  if (!wrapper) return;
-  const W = wrapper.clientWidth;
-  const H = wrapper.clientHeight;
-  if (!W || !H) return;
-  if (manualRotation) {
-    cameraContainer.style.width = H + "px";
-    cameraContainer.style.height = W + "px";
-    cameraContainer.style.transform = "rotate(90deg)";
-  } else {
-    cameraContainer.style.width = "";
-    cameraContainer.style.height = "";
-    cameraContainer.style.transform = "";
-  }
-}
+// カメラ表示エリアは CSS で 100% 固定
 
 // カメラ起動
 async function startCamera() {
@@ -306,7 +266,6 @@ document.getElementById("btn-back-event").addEventListener("click", () => {
 });
 
 document.getElementById("btn-to-camera").addEventListener("click", async () => {
-  manualRotation = false;
   showScreen("camera");
   updateFrameOverlay();
   await startCamera();
@@ -323,10 +282,6 @@ document.getElementById("btn-switch-camera").addEventListener("click", async () 
 document.getElementById("btn-zoom-in").addEventListener("click", () => setZoom(zoomLevel + ZOOM_STEP));
 document.getElementById("btn-zoom-out").addEventListener("click", () => setZoom(zoomLevel - ZOOM_STEP));
 
-document.getElementById("btn-toggle-orientation").addEventListener("click", () => {
-  manualRotation = !manualRotation;
-  fitCameraContainer();
-});
 
 document.getElementById("btn-change-frame").addEventListener("click", () => {
   stopCamera();
@@ -345,8 +300,5 @@ document.getElementById("btn-new-frame").addEventListener("click", () => {
   renderDesignList(selectedEvent);
   showScreen("design");
 });
-
-window.addEventListener("resize", autoRotateFrame);
-window.addEventListener("orientationchange", () => setTimeout(autoRotateFrame, 300));
 
 loadFrames();
