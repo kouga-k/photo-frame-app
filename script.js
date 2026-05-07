@@ -29,6 +29,9 @@ const designList      = document.getElementById("design-list");
 const countdownEl     = document.getElementById("countdown");
 const zoomLabel       = document.getElementById("zoom-label");
 
+// 手動回転（縦横切替ボタン）
+let manualRotation = false;
+
 // ズーム
 let zoomLevel = 1.0;
 const ZOOM_MIN = 1.0;
@@ -137,14 +140,27 @@ function fitCameraContainer() {
   if (!W || !H) return;
   const isYoko = selectedFrame.orientation === "yoko";
   const ratio = isYoko ? 16 / 9 : 9 / 16;
-  const wrapperRatio = W / H;
   let w, h;
-  if (wrapperRatio > ratio) {
-    h = H;
-    w = h * ratio;
+  if (manualRotation) {
+    // 90度回転：内部の幅×高さは ratio のまま、回転後の見え方が wrapper 内に収まるよう計算
+    if (W * ratio <= H) {
+      h = W;
+      w = h * ratio;
+    } else {
+      w = H;
+      h = w / ratio;
+    }
+    cameraContainer.style.transform = "rotate(90deg)";
   } else {
-    w = W;
-    h = w / ratio;
+    const wrapperRatio = W / H;
+    if (wrapperRatio > ratio) {
+      h = H;
+      w = h * ratio;
+    } else {
+      w = W;
+      h = w / ratio;
+    }
+    cameraContainer.style.transform = "";
   }
   cameraContainer.style.width = w + "px";
   cameraContainer.style.height = h + "px";
@@ -307,6 +323,7 @@ document.getElementById("btn-back-event").addEventListener("click", () => {
 });
 
 document.getElementById("btn-to-camera").addEventListener("click", async () => {
+  manualRotation = false;
   showScreen("camera");
   updateFrameOverlay();
   await startCamera();
@@ -324,16 +341,7 @@ document.getElementById("btn-zoom-in").addEventListener("click", () => setZoom(z
 document.getElementById("btn-zoom-out").addEventListener("click", () => setZoom(zoomLevel - ZOOM_STEP));
 
 document.getElementById("btn-toggle-orientation").addEventListener("click", () => {
-  if (!selectedFrame || !selectedFrame.variant) return;
-  const v = selectedFrame.variant;
-  if (!v.tate || !v.yoko || v.tate === v.yoko) {
-    alert("このデザインには縦横の切替がありません。");
-    return;
-  }
-  const newOrient = selectedFrame.orientation === "yoko" ? "tate" : "yoko";
-  selectedFrame.orientation = newOrient;
-  selectedFrame.src = newOrient === "yoko" ? v.yoko : v.tate;
-  frameOverlay.src = bust(selectedFrame.src);
+  manualRotation = !manualRotation;
   fitCameraContainer();
 });
 

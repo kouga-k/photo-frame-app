@@ -375,7 +375,13 @@ h2 {
   cursor: pointer;
   color: #fff;
   -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
+
+#btn-toggle-orientation { font-size: 0.75rem; font-weight: bold; }
 
 .btn-icon:hover { background: rgba(255,255,255,0.3); }
 
