@@ -105,8 +105,31 @@ function renderDesignList(ev) {
 function updateFrameOverlay() {
   if (selectedFrame) {
     frameOverlay.src = bust(selectedFrame.src);
-    cameraContainer.classList.toggle("landscape", selectedFrame.orientation === "yoko");
+    requestAnimationFrame(() => requestAnimationFrame(fitCameraContainer));
   }
+}
+
+// カメラ表示エリアをフレーム比率に合わせて中央配置
+function fitCameraContainer() {
+  if (!selectedFrame) return;
+  const wrapper = document.querySelector(".camera-wrapper");
+  if (!wrapper) return;
+  const W = wrapper.clientWidth;
+  const H = wrapper.clientHeight;
+  if (!W || !H) return;
+  const isYoko = selectedFrame.orientation === "yoko";
+  const ratio = isYoko ? 16 / 9 : 9 / 16;
+  const wrapperRatio = W / H;
+  let w, h;
+  if (wrapperRatio > ratio) {
+    h = H;
+    w = h * ratio;
+  } else {
+    w = W;
+    h = w / ratio;
+  }
+  cameraContainer.style.width = w + "px";
+  cameraContainer.style.height = h + "px";
 }
 
 // カメラ起動
@@ -266,8 +289,8 @@ document.getElementById("btn-back-event").addEventListener("click", () => {
 });
 
 document.getElementById("btn-to-camera").addEventListener("click", async () => {
-  updateFrameOverlay();
   showScreen("camera");
+  updateFrameOverlay();
   await startCamera();
 });
 
@@ -288,8 +311,8 @@ document.getElementById("btn-change-frame").addEventListener("click", () => {
 });
 
 document.getElementById("btn-retake").addEventListener("click", async () => {
-  updateFrameOverlay();
   showScreen("camera");
+  updateFrameOverlay();
   await startCamera();
 });
 
@@ -299,5 +322,8 @@ document.getElementById("btn-new-frame").addEventListener("click", () => {
   renderDesignList(selectedEvent);
   showScreen("design");
 });
+
+window.addEventListener("resize", fitCameraContainer);
+window.addEventListener("orientationchange", () => setTimeout(fitCameraContainer, 300));
 
 loadFrames();
