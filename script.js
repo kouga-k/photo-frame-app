@@ -130,7 +130,7 @@ function autoRotateFrame() {
   fitCameraContainer();
 }
 
-// カメラ表示エリアをフレーム比率に合わせて中央配置
+// カメラ表示エリアを画面いっぱいに（回転時は寸法を入れ替え）
 function fitCameraContainer() {
   if (!selectedFrame) return;
   const wrapper = document.querySelector(".camera-wrapper");
@@ -138,32 +138,15 @@ function fitCameraContainer() {
   const W = wrapper.clientWidth;
   const H = wrapper.clientHeight;
   if (!W || !H) return;
-  const isYoko = selectedFrame.orientation === "yoko";
-  const ratio = isYoko ? 16 / 9 : 9 / 16;
-  let w, h;
   if (manualRotation) {
-    // 90度回転：内部の幅×高さは ratio のまま、回転後の見え方が wrapper 内に収まるよう計算
-    if (W * ratio <= H) {
-      h = W;
-      w = h * ratio;
-    } else {
-      w = H;
-      h = w / ratio;
-    }
+    cameraContainer.style.width = H + "px";
+    cameraContainer.style.height = W + "px";
     cameraContainer.style.transform = "rotate(90deg)";
   } else {
-    const wrapperRatio = W / H;
-    if (wrapperRatio > ratio) {
-      h = H;
-      w = h * ratio;
-    } else {
-      w = W;
-      h = w / ratio;
-    }
+    cameraContainer.style.width = "";
+    cameraContainer.style.height = "";
     cameraContainer.style.transform = "";
   }
-  cameraContainer.style.width = w + "px";
-  cameraContainer.style.height = h + "px";
 }
 
 // カメラ起動
