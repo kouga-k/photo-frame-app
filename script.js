@@ -1,10 +1,9 @@
 // 状態
 let eventsData = [];
 let selectedEvent = null;
-let selectedVariant = null;
+let selectedFrame = null; // { id, label, src }
 let currentStream = null;
 let facingMode = "environment";
-let isLandscape = false;
 
 // キャッシュ対策（起動ごとに新しい値）
 const cacheBust = Date.now();
@@ -58,31 +57,36 @@ function renderEventList() {
   });
 }
 
-// デザイン一覧を描画
+// デザイン一覧を描画（縦・横を別アイテムとして表示）
 function renderDesignList(ev) {
   designList.innerHTML = "";
-  selectedVariant = null;
+  selectedFrame = null;
+
+  const frames = [];
   ev.variants.forEach((v) => {
-    const thumbSrc = bust(v.tate);
+    if (v.tate) frames.push({ id: v.id + "_tate", label: v.label + "（縦）", src: v.tate, orientation: "tate" });
+    if (v.yoko && v.yoko !== v.tate) frames.push({ id: v.id + "_yoko", label: v.label + "（横）", src: v.yoko, orientation: "yoko" });
+  });
+
+  frames.forEach((f) => {
     const div = document.createElement("div");
-    div.className = "frame-item";
-    div.innerHTML = `<img src="${thumbSrc}" alt="${v.label}"><span class="frame-label">${v.label}</span>`;
+    div.className = "frame-item frame-item-" + f.orientation;
+    div.innerHTML = `<img src="${bust(f.src)}" alt="${f.label}"><span class="frame-label">${f.label}</span>`;
     div.addEventListener("click", () => {
       document.querySelectorAll(".frame-item").forEach((el) => el.classList.remove("selected"));
       div.classList.add("selected");
-      selectedVariant = v;
+      selectedFrame = f;
       document.getElementById("btn-to-camera").disabled = false;
     });
     designList.appendChild(div);
   });
 }
 
-// 縦横判定
-function checkOrientation() {
-  isLandscape = window.innerWidth > window.innerHeight;
-  cameraContainer.classList.toggle("landscape", isLandscape);
-  if (selectedVariant) {
-    frameOverlay.src = bust(isLandscape ? selectedVariant.yoko : selectedVariant.tate);
+// フレーム表示更新
+function updateFrameOverlay() {
+  if (selectedFrame) {
+    frameOverlay.src = bust(selectedFrame.src);
+    cameraContainer.classList.toggle("landscape", selectedFrame.orientation === "yoko");
   }
 }
 
@@ -121,7 +125,7 @@ function capture() {
 
   const frameImg = new Image();
   frameImg.crossOrigin = "anonymous";
-  frameImg.src = bust(isLandscape ? selectedVariant.yoko : selectedVariant.tate);
+  frameImg.src = bust(selectedFrame.src);
 
   frameImg.onload = () => {
     const w = frameImg.naturalWidth;
@@ -173,8 +177,7 @@ document.getElementById("btn-back-event").addEventListener("click", () => {
 });
 
 document.getElementById("btn-to-camera").addEventListener("click", async () => {
-  checkOrientation();
-  frameOverlay.src = isLandscape ? selectedVariant.yoko : selectedVariant.tate;
+  updateFrameOverlay();
   showScreen("camera");
   await startCamera();
 });
@@ -192,20 +195,16 @@ document.getElementById("btn-change-frame").addEventListener("click", () => {
 });
 
 document.getElementById("btn-retake").addEventListener("click", async () => {
-  checkOrientation();
-  frameOverlay.src = isLandscape ? selectedVariant.yoko : selectedVariant.tate;
+  updateFrameOverlay();
   showScreen("camera");
   await startCamera();
 });
 
 document.getElementById("btn-new-frame").addEventListener("click", () => {
-  selectedVariant = null;
+  selectedFrame = null;
   document.getElementById("btn-to-camera").disabled = true;
   renderDesignList(selectedEvent);
   showScreen("design");
 });
-
-window.addEventListener("resize", checkOrientation);
-window.addEventListener("orientationchange", () => setTimeout(checkOrientation, 300));
 
 loadFrames();
