@@ -27,6 +27,24 @@ const btnSave         = document.getElementById("btn-save");
 const eventList       = document.getElementById("event-list");
 const designList      = document.getElementById("design-list");
 const countdownEl     = document.getElementById("countdown");
+const zoomLabel       = document.getElementById("zoom-label");
+
+// ズーム
+let zoomLevel = 1.0;
+const ZOOM_MIN = 1.0;
+const ZOOM_MAX = 3.0;
+const ZOOM_STEP = 0.5;
+
+function applyZoom() {
+  const mirror = facingMode === "user" ? "scaleX(-1) " : "";
+  video.style.transform = mirror + "scale(" + zoomLevel + ")";
+  zoomLabel.textContent = zoomLevel.toFixed(1) + "倍";
+}
+
+function setZoom(z) {
+  zoomLevel = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z));
+  applyZoom();
+}
 
 // 画面切替
 function showScreen(name) {
@@ -102,7 +120,7 @@ async function startCamera() {
     });
     video.srcObject = currentStream;
     await video.play();
-    video.style.transform = facingMode === "user" ? "scaleX(-1)" : "";
+    applyZoom();
   } catch {
     alert("カメラを起動できませんでした。\nカメラの使用を許可してください。");
   }
@@ -163,14 +181,16 @@ function composeOne(frameImg) {
 
   const va = video.videoWidth / video.videoHeight;
   const ca = w / h;
-  let sx, sy, sw, sh;
+  let sw, sh;
   if (va > ca) {
-    sh = video.videoHeight; sw = sh * ca;
-    sx = (video.videoWidth - sw) / 2; sy = 0;
+    sh = video.videoHeight / zoomLevel;
+    sw = sh * ca;
   } else {
-    sw = video.videoWidth; sh = sw / ca;
-    sx = 0; sy = (video.videoHeight - sh) / 2;
+    sw = video.videoWidth / zoomLevel;
+    sh = sw / ca;
   }
+  const sx = (video.videoWidth - sw) / 2;
+  const sy = (video.videoHeight - sh) / 2;
 
   if (facingMode === "user") {
     ctx.save();
@@ -257,6 +277,9 @@ document.getElementById("btn-switch-camera").addEventListener("click", async () 
   facingMode = facingMode === "environment" ? "user" : "environment";
   await startCamera();
 });
+
+document.getElementById("btn-zoom-in").addEventListener("click", () => setZoom(zoomLevel + ZOOM_STEP));
+document.getElementById("btn-zoom-out").addEventListener("click", () => setZoom(zoomLevel - ZOOM_STEP));
 
 document.getElementById("btn-change-frame").addEventListener("click", () => {
   stopCamera();
