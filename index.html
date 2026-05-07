@@ -8,6 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>フォトフレーム撮影</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4/face_detection.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -50,12 +51,18 @@
     <div class="camera-wrapper">
       <div id="camera-container" class="camera-container">
         <video id="video" autoplay playsinline muted></video>
+        <canvas id="face-overlay" class="face-overlay"></canvas>
         <img id="frame-overlay" class="frame-overlay" src="" alt="">
+        <div id="countdown" class="countdown"></div>
       </div>
     </div>
     <div class="camera-controls">
       <button id="btn-switch-camera" class="btn-icon" title="カメラ切替">🔄</button>
-      <button id="btn-capture" class="btn-capture">撮影する</button>
+      <div class="capture-stack">
+        <button id="btn-capture" class="btn-capture">撮影</button>
+        <button id="btn-timer" class="btn-timer">⏱ 5秒タイマー</button>
+        <p class="timer-hint">5秒後に3枚連続撮影します</p>
+      </div>
       <button id="btn-change-frame" class="btn-icon" title="デザイン変更">🖼️</button>
     </div>
   </div>
@@ -67,6 +74,8 @@
       <div class="preview-wrapper">
         <canvas id="canvas-result" style="display:none;"></canvas>
         <img id="img-result" class="img-result" src="" alt="撮影結果">
+        <div id="burst-thumbs" class="burst-thumbs"></div>
+        <p class="burst-hint">気に入った1枚をタップしてください</p>
       </div>
       <a id="btn-save" class="btn-primary" download="photo-frame.png">保存する</a>
       <button id="btn-retake" class="btn-secondary">撮り直す</button>
