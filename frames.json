@@ -4,11 +4,13 @@
     "label": "母の日",
     "emoji": "💐",
     "variants": [
-      { "id": "motherA", "label": "母の日A", "tate": "frames/mother/motherA_tate.png", "yoko": "frames/mother/motherA_tate.png" },
-      { "id": "motherB", "label": "母の日B", "tate": "frames/mother/motherB_tate.png", "yoko": "frames/mother/motherB_tate.png" },
-      { "id": "motherC", "label": "母の日C", "tate": "frames/mother/motherC_tate.png", "yoko": "frames/mother/motherC_tate.png" },
-      { "id": "heart",   "label": "ハート",   "tate": "frames/mother/heart_tate.png",   "yoko": "frames/mother/heart_tate.png" },
-      { "id": "lace",    "label": "レース",   "tate": "frames/mother/lace_tate.png",    "yoko": "frames/mother/lace_tate.png" }
+      { "id": "motherA", "label": "母の日A", "tate": "frames/mother/mother_tateA.png", "yoko": "frames/mother/mother_yokoA.png" },
+      { "id": "motherB", "label": "母の日B", "tate": "frames/mother/mother_tateB.png", "yoko": "frames/mother/mother_yokoB.png" },
+      { "id": "motherC", "label": "母の日C", "tate": "frames/mother/mother_tateC.png", "yoko": "frames/mother/mother_yokoC.png" },
+      { "id": "motherD", "label": "母の日D", "tate": "frames/mother/mother_tateD.png", "yoko": "frames/mother/mother_yokoD.png" },
+      { "id": "motherE", "label": "母の日E", "tate": "frames/mother/mother_tateE.png", "yoko": "frames/mother/mother_tateE.png" },
+      { "id": "heartA",  "label": "ハートA",  "tate": "frames/mother/heartA_tate.png",  "yoko": "frames/mother/heartA_tate.png" },
+      { "id": "heartB",  "label": "ハートB",  "tate": "frames/mother/heartB_tate.png",  "yoko": "frames/mother/heartB_tate.png" }
     ]
   },
   {
