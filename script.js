@@ -26,53 +26,7 @@ const imgResult       = document.getElementById("img-result");
 const btnSave         = document.getElementById("btn-save");
 const eventList       = document.getElementById("event-list");
 const designList      = document.getElementById("design-list");
-const faceCanvas      = document.getElementById("face-overlay");
-const faceCtx         = faceCanvas.getContext("2d");
 const countdownEl     = document.getElementById("countdown");
-
-// 顔検出
-let faceDetector = null;
-let detectionRunning = false;
-
-async function initFaceDetection() {
-  if (typeof FaceDetection === "undefined") return;
-  try {
-    faceDetector = new FaceDetection({
-      locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4/${f}`,
-    });
-    faceDetector.setOptions({ model: "short", minDetectionConfidence: 0.5 });
-    faceDetector.onResults(onFaceResults);
-  } catch (e) {
-    faceDetector = null;
-  }
-}
-
-function onFaceResults(results) {
-  if (!video.videoWidth) return;
-  faceCanvas.width = video.videoWidth;
-  faceCanvas.height = video.videoHeight;
-  faceCtx.clearRect(0, 0, faceCanvas.width, faceCanvas.height);
-  if (!results.detections) return;
-  for (const det of results.detections) {
-    const bb = det.boundingBox;
-    const cx = bb.xCenter * faceCanvas.width;
-    const cy = bb.yCenter * faceCanvas.height;
-    const r = Math.max(bb.width * faceCanvas.width, bb.height * faceCanvas.height) / 2 * 1.15;
-    faceCtx.strokeStyle = "#FFD700";
-    faceCtx.lineWidth = 5;
-    faceCtx.beginPath();
-    faceCtx.arc(cx, cy, r, 0, Math.PI * 2);
-    faceCtx.stroke();
-  }
-}
-
-async function detectLoop() {
-  if (!detectionRunning || !faceDetector) return;
-  if (video.readyState >= 2) {
-    try { await faceDetector.send({ image: video }); } catch {}
-  }
-  setTimeout(detectLoop, 150);
-}
 
 // 画面切替
 function showScreen(name) {
@@ -133,37 +87,6 @@ function renderDesignList(ev) {
 function updateFrameOverlay() {
   if (selectedFrame) {
     frameOverlay.src = bust(selectedFrame.src);
-    cameraContainer.classList.toggle("landscape", selectedFrame.orientation === "yoko");
-    updateRotation();
-  }
-}
-
-// 横フレーム×縦画面なら90度回転して大きく表示
-function updateRotation() {
-  if (!selectedFrame) return;
-  const wrapper = document.querySelector(".camera-wrapper");
-  if (!wrapper) return;
-  const W = wrapper.clientWidth;
-  const H = wrapper.clientHeight;
-  const isPortraitScreen = H > W;
-  const isYoko = selectedFrame.orientation === "yoko";
-
-  if (isYoko && isPortraitScreen) {
-    let w, h;
-    if ((16 / 9) * W <= H) {
-      h = W;
-      w = (16 / 9) * W;
-    } else {
-      w = H;
-      h = (9 / 16) * H;
-    }
-    cameraContainer.style.width = w + "px";
-    cameraContainer.style.height = h + "px";
-    cameraContainer.classList.add("rotated");
-  } else {
-    cameraContainer.style.width = "";
-    cameraContainer.style.height = "";
-    cameraContainer.classList.remove("rotated");
   }
 }
 
@@ -179,14 +102,7 @@ async function startCamera() {
     });
     video.srcObject = currentStream;
     await video.play();
-    const mirror = facingMode === "user" ? "scaleX(-1)" : "";
-    video.style.transform = mirror;
-    faceCanvas.style.transform = mirror;
-    if (!faceDetector) await initFaceDetection();
-    if (!detectionRunning) {
-      detectionRunning = true;
-      detectLoop();
-    }
+    video.style.transform = facingMode === "user" ? "scaleX(-1)" : "";
   } catch {
     alert("カメラを起動できませんでした。\nカメラの使用を許可してください。");
   }
@@ -194,8 +110,6 @@ async function startCamera() {
 
 // カメラ停止
 function stopCamera() {
-  detectionRunning = false;
-  faceCtx && faceCtx.clearRect(0, 0, faceCanvas.width, faceCanvas.height);
   if (currentStream) {
     currentStream.getTracks().forEach((t) => t.stop());
     currentStream = null;
@@ -361,8 +275,5 @@ document.getElementById("btn-new-frame").addEventListener("click", () => {
   renderDesignList(selectedEvent);
   showScreen("design");
 });
-
-window.addEventListener("resize", updateRotation);
-window.addEventListener("orientationchange", () => setTimeout(updateRotation, 300));
 
 loadFrames();
