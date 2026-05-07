@@ -83,8 +83,8 @@ function renderDesignList(ev) {
 
   const frames = [];
   ev.variants.forEach((v) => {
-    if (v.tate) frames.push({ id: v.id + "_tate", label: v.label + "（縦）", src: v.tate, orientation: "tate" });
-    if (v.yoko && v.yoko !== v.tate) frames.push({ id: v.id + "_yoko", label: v.label + "（横）", src: v.yoko, orientation: "yoko" });
+    if (v.tate) frames.push({ id: v.id + "_tate", label: v.label + "（縦）", src: v.tate, orientation: "tate", variant: v });
+    if (v.yoko && v.yoko !== v.tate) frames.push({ id: v.id + "_yoko", label: v.label + "（横）", src: v.yoko, orientation: "yoko", variant: v });
   });
 
   frames.forEach((f) => {
@@ -107,6 +107,24 @@ function updateFrameOverlay() {
     frameOverlay.src = bust(selectedFrame.src);
     requestAnimationFrame(() => requestAnimationFrame(fitCameraContainer));
   }
+}
+
+// スマホ向きに合わせてフレームを自動切り替え
+function autoRotateFrame() {
+  if (!selectedFrame || !selectedFrame.variant) return;
+  const v = selectedFrame.variant;
+  if (!v.tate || !v.yoko || v.tate === v.yoko) {
+    fitCameraContainer();
+    return;
+  }
+  const isLandscapeScreen = window.innerWidth > window.innerHeight;
+  const wantOrientation = isLandscapeScreen ? "yoko" : "tate";
+  if (selectedFrame.orientation !== wantOrientation) {
+    selectedFrame.orientation = wantOrientation;
+    selectedFrame.src = wantOrientation === "yoko" ? v.yoko : v.tate;
+    frameOverlay.src = bust(selectedFrame.src);
+  }
+  fitCameraContainer();
 }
 
 // カメラ表示エリアをフレーム比率に合わせて中央配置
@@ -323,7 +341,7 @@ document.getElementById("btn-new-frame").addEventListener("click", () => {
   showScreen("design");
 });
 
-window.addEventListener("resize", fitCameraContainer);
-window.addEventListener("orientationchange", () => setTimeout(fitCameraContainer, 300));
+window.addEventListener("resize", autoRotateFrame);
+window.addEventListener("orientationchange", () => setTimeout(autoRotateFrame, 300));
 
 loadFrames();
