@@ -206,5 +206,6 @@ document.getElementById("btn-new-frame").addEventListener("click", () => {
 });
 
 window.addEventListener("resize", checkOrientation);
+window.addEventListener("orientationchange", () => setTimeout(checkOrientation, 300));
 
 loadFrames();
