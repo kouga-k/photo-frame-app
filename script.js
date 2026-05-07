@@ -323,6 +323,20 @@ document.getElementById("btn-switch-camera").addEventListener("click", async () 
 document.getElementById("btn-zoom-in").addEventListener("click", () => setZoom(zoomLevel + ZOOM_STEP));
 document.getElementById("btn-zoom-out").addEventListener("click", () => setZoom(zoomLevel - ZOOM_STEP));
 
+document.getElementById("btn-toggle-orientation").addEventListener("click", () => {
+  if (!selectedFrame || !selectedFrame.variant) return;
+  const v = selectedFrame.variant;
+  if (!v.tate || !v.yoko || v.tate === v.yoko) {
+    alert("このデザインには縦横の切替がありません。");
+    return;
+  }
+  const newOrient = selectedFrame.orientation === "yoko" ? "tate" : "yoko";
+  selectedFrame.orientation = newOrient;
+  selectedFrame.src = newOrient === "yoko" ? v.yoko : v.tate;
+  frameOverlay.src = bust(selectedFrame.src);
+  fitCameraContainer();
+});
+
 document.getElementById("btn-change-frame").addEventListener("click", () => {
   stopCamera();
   showScreen("design");
