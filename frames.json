@@ -6,11 +6,12 @@
     "variants": [
       { "id": "motherA", "label": "母の日A", "tate": "frames/mother/mother_tateA.png" },
       { "id": "motherB", "label": "母の日B", "tate": "frames/mother/mother_tateB.png" },
-      { "id": "motherC", "label": "母の日C", "tate": "frames/mother/mother_tateC.png" },
-      { "id": "motherD", "label": "母の日D", "tate": "frames/mother/mother_tateD.png" },
-      { "id": "motherE", "label": "母の日E", "tate": "frames/mother/mother_tateE.png" },
-      { "id": "heartA",  "label": "ハートA",  "tate": "frames/mother/heartA_tate.png" },
-      { "id": "heartB",  "label": "ハートB",  "tate": "frames/mother/heartB_tate.png" }
+      { "id": "motherC", "label": "母の日C", "tate": "frames/mother/mother_tateF.png" },
+      { "id": "heartA",  "label": "ハートA",  "tate": "frames/mother/heart_tateA.png" },
+      { "id": "heartB",  "label": "ハートB",  "tate": "frames/mother/heart_tateB.png" },
+      { "id": "heartC",  "label": "ハートC",  "tate": "frames/mother/heart_tateC.png" },
+      { "id": "heartD",  "label": "ハートD",  "tate": "frames/mother/heart_tateD.png" },
+      { "id": "heartE",  "label": "ハートE",  "tate": "frames/mother/heart_tateE.png" }
     ]
   },
   {
