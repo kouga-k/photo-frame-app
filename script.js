@@ -31,9 +31,9 @@ const zoomLabel       = document.getElementById("zoom-label");
 
 // ズーム
 let zoomLevel = 1.0;
-const ZOOM_MIN = 1.0;
+const ZOOM_MIN = 0.6;
 const ZOOM_MAX = 3.0;
-const ZOOM_STEP = 0.5;
+const ZOOM_STEP = 0.2;
 
 function applyZoom() {
   const mirror = facingMode === "user" ? "scaleX(-1) " : "";
@@ -183,24 +183,34 @@ function composeOne(frameImg) {
   const va = video.videoWidth / video.videoHeight;
   const ca = w / h;
   let sw, sh;
+  const cropZoom = Math.max(zoomLevel, 1);
   if (va > ca) {
-    sh = video.videoHeight / zoomLevel;
+    sh = video.videoHeight / cropZoom;
     sw = sh * ca;
   } else {
-    sw = video.videoWidth / zoomLevel;
+    sw = video.videoWidth / cropZoom;
     sh = sw / ca;
   }
   const sx = (video.videoWidth - sw) / 2;
   const sy = (video.videoHeight - sh) / 2;
 
+  // 1.0倍未満は中央に縮小描画
+  const dw = zoomLevel < 1 ? w * zoomLevel : w;
+  const dh = zoomLevel < 1 ? h * zoomLevel : h;
+  const dx = (w - dw) / 2;
+  const dy = (h - dh) / 2;
+
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, w, h);
+
   if (facingMode === "user") {
     ctx.save();
-    ctx.translate(w, 0);
+    ctx.translate(w - dx, dy);
     ctx.scale(-1, 1);
-    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, dw, dh);
     ctx.restore();
   } else {
-    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
+    ctx.drawImage(video, sx, sy, sw, sh, dx, dy, dw, dh);
   }
 
   ctx.drawImage(frameImg, 0, 0, w, h);
